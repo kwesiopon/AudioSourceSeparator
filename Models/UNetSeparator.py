@@ -3,8 +3,10 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv1D, LeakyRelU, MaxPool1D, Dropout, concatenate, UpSampling1D
 import tensorflow as tf
 '''
-Base U-Net Model for Audio Source Extraction
+Slightly modified  U-Net Model for Audio Source Extraction
 We utilize causal padding to account for temporal nature of the data
+additionally we use dilated convulation layers to investigate the 
+impact of performance.
 
 TODO:Need to determine suitable size of filters and input size
 '''
