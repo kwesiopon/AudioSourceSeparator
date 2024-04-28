@@ -34,6 +34,6 @@ predicted_audio = predict_audio(model, input_audio)
 
 # Process the predicted output as needed (e.g., save to file)
 # Example: Save the predicted audio to a new file
-output_audio_path = '/path/to/save/predicted/audio/file.wav'
+output_audio_path = '/Users/emb/downloads/AudioSourceSeparator/audioOut/file.wav'
 librosa.output.write_wav(output_audio_path, predicted_audio.flatten(), sr=target_sr)
 
