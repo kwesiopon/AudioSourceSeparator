@@ -10,13 +10,8 @@ def load(path):
     return y, sr
 
 def getBatchFromDataSet(dataset_path, batch_size):
-    # Get all audio file paths in the dataset path
-    audio_files = [os.path.join(root, file) for root, dirs, files in os.walk(dataset_path) for file in files]
-
-    # Shuffle the audio files for randomness
+    audio_files = [os.path.join(root, file) for root, dirs, files in os.walk(dataset_path) for file in files if file.endswith(('.wav', '.mp3'))]
     np.random.shuffle(audio_files)
-
-    # Yield batches of audio data
     for i in range(0, len(audio_files), batch_size):
         batch_paths = audio_files[i:i + batch_size]
         yield batch_paths

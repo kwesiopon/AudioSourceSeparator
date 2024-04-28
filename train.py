@@ -25,5 +25,5 @@ for batch_paths in getBatchFromDataSet(dataset_path, batch_size):
     model.fit(batch_data, batch_data, epochs=epochs, validation_split=validation_split)
 
 # Optionally save the trained model
-model.save('/Users/emb/downloads/AudioSourceSeparator/trainedmodels')
+model.save('/Users/emb/downloads/AudioSourceSeparator/trainedmodels/out.keras')
 
