@@ -1,6 +1,6 @@
 import numpy as np
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Conv1D, LeakyRelU, MaxPool1D, Dropout, concatenate, UpSampling1D
+from tensorflow.keras.layers import Input, Conv1D, LeakyReLU, MaxPool1D, Dropout, concatenate, UpSampling1D
 import tensorflow as tf
 '''
 Slightly modified  U-Net Model for Audio Source Extraction
