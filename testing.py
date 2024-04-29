@@ -7,10 +7,7 @@ model = tf.keras.models.load_model('/Users/emb/downloads/AudioSourceSeparator/tr
 
 def preprocess_audio(file_path, target_sr, max_length=None):
     # Load and preprocess the audio file
-    y, sr = librosa.load(file_path, sr=target_sr)  # Load with target sample rate
-    if max_length is not None:
-        y = y[:max_length] if len(y) > max_length else np.pad(y, (0, max_length - len(y)), mode='constant')
-    return y
+    y, sr = librosa.load(file_path)  # Load with target sample rate
 
 def predict_audio(model, audio_data):
     # Reshape input audio data (assuming model input shape is compatible)
