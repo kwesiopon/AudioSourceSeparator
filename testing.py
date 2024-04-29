@@ -22,7 +22,7 @@ def predict_audio(model, audio_data):
     return predicted_data
 
 # Path to the new audio file
-new_audio_path = '/Users/emb/downloads/AudioSourceSeparator/AllSaintsNeverEver(BookerTsUpNorthdub).flac'
+new_audio_path = '/Users/emb/downloads/AudioSourceSeparator/SweetFemaleAttitudeFlowers(SunshipEdit).mp3'
 
 # Load and preprocess the new audio file
 target_sr = 44100  # Target sample rate

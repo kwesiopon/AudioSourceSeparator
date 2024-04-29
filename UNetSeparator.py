@@ -1,14 +1,13 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Conv1D, Conv1DTranspose, concatenate, Layer
+from tensorflow.keras.layers import Conv1D, Conv1DTranspose, Concatenate, Layer
 from tensorflow.keras import backend as K
 
-def conv_layer(inputs, num_filters):
-    conv1d = Conv1D(num_filters, 10, activation='relu', padding='same')(inputs)
-    return conv1d
+def conv_layer(inputs, num_filters, kernel_size=3, activation='relu', padding='same'):
+    return Conv1D(num_filters, kernel_size, activation=activation, padding=padding)(inputs)
 
 def encoder(inputs, num_filters):
     encode = conv_layer(inputs, num_filters)
-    pool_layer = tf.keras.layers.MaxPool1D(5)(encode)
+    pool_layer = tf.keras.layers.MaxPool1D(pool_size=2, padding='same')(encode)
     return encode, pool_layer
 
 def decoder(inputs, skip, num_filters):
@@ -31,16 +30,21 @@ def decoder(inputs, skip, num_filters):
         else:
             pad_size = abs(crop_size) // 2
             skip = K.temporal_padding(skip, padding=(pad_size, pad_size))
+    # Reshape skip tensor to match decode tensor's time dimension
+    #skip = tf.keras.layers.Reshape((70, -1))(skip)
+    # Crop skip tensor to match decode tensor's time dimension
+    #skip = skip[:, :70, :]
+
 
     # Concatenate the decoded output with the adjusted skip connection
-    decode = concatenate([decode, skip], axis=-1)
+    decode = tf.keras.layers.Concatenate(axis=1)([decode, skip])
 
     # Apply convolutional layer to the concatenated output
     decode = conv_layer(decode, num_filters)
     return decode
 
 def build_unet(input_shape):
-    inputs = tf.keras.layers.Input(input_shape)
+    inputs = tf.keras.layers.Input(shape=input_shape)
 
     # Encoder
     e1, p1 = encoder(inputs, 32)
@@ -60,4 +64,3 @@ def build_unet(input_shape):
     output_layer = Conv1D(1, 1, activation='tanh', padding='same')(d4)
     model = tf.keras.models.Model(inputs, output_layer, name="Base_UNET")
     return model
-
