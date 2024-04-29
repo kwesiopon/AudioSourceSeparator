@@ -6,9 +6,9 @@ import librosa
 def resample(audio,orig_sr,new_sr):
     return librosa.resample(audio,orig_sr,new_sr)
 
-def load(path,sr):
+def load(path):
     #Outputs audio (n_frames,n_channels)
-    y, sr = librosa.load(path,sr)
+    y, sr = librosa.load(path)
     if len(y.shape) == 1:
         y = np.expand_dims(y,axis=0)
     return y.T,sr
@@ -21,7 +21,7 @@ def getBatchFromDataSet(dataset_path,batch_size):
     np.random.shuffle(audio_files)
 
     #Yield batches of audio data
-    for i in range(0,len(audio_files).batch_size):
+    for i in range(0,len(audio_files),batch_size):
         batch_paths = audio_files[i:i + batch_size]
 
     return batch_paths
@@ -39,7 +39,7 @@ def getProcessedAudio(batch_path,target_sr):
         orig_sr = librosa.get_samplerate(file_path)
 
         #Load and preprocess each audio file
-        y, sr = load(file_path,target_sr)
+        y, sr = load(file_path)
 
         #Resample Audio if lower than target sample rate
         if orig_sr > target_sr:
@@ -48,7 +48,8 @@ def getProcessedAudio(batch_path,target_sr):
         else:
             batch_data.append(y)
 
-    return batch_data
+    audio_array = np.asarray(batch_data,dtype="object")
+    return audio_array
 
 def audio_numpy_to_spectogram(audio_data):
     spectogram = librosa.stft( audio_data)
