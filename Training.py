@@ -29,13 +29,18 @@ def train(data_path,input_shape):
         print(type(val), val.shape)
     #build Model
 
+    input_shape = (max_length,1)
     model = UNetModel.build_unet(input_shape)
     x_train = np.array(standardized_data)
-    x_train_tensor = tf.convert_to_tensor(x_train,dtype=tf.float32)
+    x_train_reshape = x_train.reshape(-1,max_length,1)
+    x_train_tensor = tf.convert_to_tensor(x_train_reshape,dtype=tf.float32)
+    print(x_train_tensor.shape)
+    print(model.summary())
 
 
-    model.fit(x=x_train_tensor,epochs=100,verbose=0)
-    model.compile(optimizer="adam" ,loss="sparse_categorical_crossentropy")
+    history =  model.fit(x=x_train_tensor, epochs=100, verbose=0)
+    model.compile(optimizer="adam" ,loss="mean_squared_error")
 
     #model.save("/Users/Kwesi/PycharmProjects/AudioSourceSeparator/train_modelUNO.keras")
     print("Model Trained!")
+    return history

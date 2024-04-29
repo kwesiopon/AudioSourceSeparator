@@ -22,7 +22,7 @@ def conv_layer(inputs,num_filters):
     :param num_filters:
     :return:
     '''
-    conv1d= tf.keras.layers.Conv1D(num_filters,2,padding='causal')(inputs)
+    conv1d= tf.keras.layers.Conv1D(num_filters,2,activation='relu',padding='causal')(inputs)
     #print(conv1d.shape)
     activation = layers.ReLU()(conv1d)
     return activation
@@ -33,7 +33,7 @@ def encoder(inputs,num_filters):
     return encode,pool_layer
 
 def decoder(inputs,skip,num_filters):
-    decode = layers.Conv1DTranspose(num_filters,10,strides=2,padding='same')(inputs)
+    decode = layers.UpSampling1D(2)(inputs)
     # Get shape information for skip and decode tensors
     '''
         skip_shape = K.int_shape(skip)
@@ -69,7 +69,7 @@ def build_unet(input_shape):
     #Encoder
     e1, p1 = encoder(inputs,32)
     #print(e1.shape)
-    #print(p1.shape)
+    #print(p1.shape)cc
     e2, p2 = encoder(p1,64)
     e3, p3 = encoder(p2,128)
     e4, p4 = encoder(p3, 256)
@@ -87,5 +87,5 @@ def build_unet(input_shape):
 
     output_layer = tf.keras.layers.Conv1D(1,1,activation='tanh',padding='same')(d4)
     model = tf.keras.models.Model(inputs,output_layer,name="U-NET")
-    model.compile(loss='sparse_categorical_crossentropy', optimizer='adam')
+    model.compile(loss='mean_squared_error', optimizer='adam')
     return model
