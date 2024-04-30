@@ -14,19 +14,8 @@ def train(data_path,input_shape):
     for val in pre_processed_data:
         print(type(val), val.shape)
 
-    max_length = max(arr.shape[0] for arr in pre_processed_data)
-    standardized_data = []
-    for arr in pre_processed_data:
-        if arr.shape[0] < max_length:
-            # Pad with zeros to match max_length
-            padded_arr = np.pad(arr, [(0, max_length - arr.shape[0]), (0, 0)], mode='constant')
-        else:
-            # Truncate to max_length
-            padded_arr = arr[:max_length, :]
-        standardized_data.append(padded_arr)
-
-    for val in standardized_data:
-        print(type(val), val.shape)
+    max_length = min(arr.shape[0] for arr in pre_processed_data)
+    standardized_data = Util.padding_output(pre_processed_data,max_length)
     #build Model
 
     input_shape = (max_length,1)
@@ -34,12 +23,16 @@ def train(data_path,input_shape):
     x_train = np.array(standardized_data)
     x_train_reshape = x_train.reshape(-1,max_length,1)
     x_train_tensor = tf.convert_to_tensor(x_train_reshape,dtype=tf.float32)
+
+    print("Tensor Info:", x_train_tensor)
+    print("Any NaN in tensor:", tf.math.is_nan(x_train_tensor).numpy().any())
+    print("Tensor Shape and Type:", x_train_tensor.shape, x_train_tensor.dtype)
     print(x_train_tensor.shape)
     print(model.summary())
 
+    model.compile(loss='mean_squared_error', optimizer='adam')
 
-    history =  model.fit(x=x_train_tensor,batch_size=64, epochs=100, verbose=2)
-
+    history =  model.fit(x=x_train_tensor, epochs=100, verbose=2)
 
     #model.save("/Users/Kwesi/PycharmProjects/AudioSourceSeparator/train_modelUNO.keras")
     print("Model Trained!")

@@ -2,9 +2,10 @@ import numpy as np
 import tensorflow as tf
 import keras
 from keras import layers
-from tensorflow.keras.layers import Input, Conv1D, LeakyReLU, MaxPool1D, Dropout, concatenate, UpSampling1D, BatchNormalization,Activation
+from tensorflow.keras.layers import Input, Conv1D, MaxPool1D, Dropout, UpSampling1D, BatchNormalization,Activation, Cropping1D
 from tensorflow.keras.models import Model
 from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Lambda
 
 
 '''
@@ -22,23 +23,41 @@ def conv_layer(inputs,num_filters):
     :param num_filters:
     :return:
     '''
-    conv1d= tf.keras.layers.Conv1D(num_filters,1,activation='relu',padding='same')(inputs)
+    conv1d= tf.keras.layers.Conv1D(num_filters,1, activation='relu', padding='same', dilation_rate=2)(inputs)
     #print(conv1d.shape)
     activation = layers.ReLU()(conv1d)
     return activation
 
+def adjust_shape_for_concat(decode, skip):
+    if decode.shape[1] != skip.shape[1]:
+        # Trim or pad the decode output
+        if decode.shape[1] > skip.shape[1]:
+            decode = decode[:, :skip.shape[1], :]
+        else:
+            pad_size = skip.shape[1] - decode.shape[1]
+            decode = tf.pad(decode, [[0, 0], [0, pad_size], [0, 0]])
+    return decode
+
+
 def encoder(inputs,num_filters):
     encode = conv_layer(inputs,num_filters)
-    pool_layer = layers.MaxPool1D(pool_size=2,padding='same')(encode)
+    print("Before Pooling:", encode.shape)
+    pool_layer = layers.MaxPool1D(pool_size=2,strides=2,padding='same')(encode)
+    print("After Pooling:", pool_layer.shape)
     return encode,pool_layer
 
 def decoder(inputs,skip,num_filters):
+    print("Before Upsampling:", inputs.shape)
     decode = layers.UpSampling1D(2)(inputs)
-    # Get shape information for skip and decode tensors
+    #decode = layers.Conv1DTranspose(num_filters,1,strides=1,padding='same')(inputs)
+    print("After Upsampling:", decode.shape)
 
+    # Get shape information for skip and decode tensors
+    decode = adjust_shape_for_concat(decode, skip)
     decode = layers.Concatenate(axis=1)([decode,skip])
-    #decode = tf.keras.layers.concatenate([inputs,decode,skip],axis=1)
     decode = conv_layer(decode,num_filters)
+
+    #decode = layers.Cropping1D(1)(decode)
     return  decode
 
 def build_unet(input_shape):
@@ -48,7 +67,7 @@ def build_unet(input_shape):
     :param input_shape:
     :return:
     '''
-    inputs = tf.keras.layers.Input(input_shape)
+    inputs = tf.keras.layers.Input(shape=input_shape)
 
     #Encoder
     e1, p1 = encoder(inputs,1024)
@@ -63,10 +82,10 @@ def build_unet(input_shape):
     d1 = decoder(bridge,e4,1024)
     d2 = decoder(d1,e3,1024)
     d3 = decoder(d2, e2,1024)
-    d4 = decoder(d3,e1,1024)
+    #d4 = decoder(d3,e1,1024)
 
 
-    output_layer = tf.keras.layers.Conv1D(1,32,activation='tanh',padding='same')(d4)
+    output_layer = tf.keras.layers.Conv1D(1,32,activation='tanh',padding='same')(d3)
     model = tf.keras.models.Model(inputs,output_layer,name="U-NET")
-    model.compile(loss='mean_squared_error', optimizer='adam')
+
     return model

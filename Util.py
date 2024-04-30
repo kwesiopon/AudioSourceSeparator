@@ -51,6 +51,26 @@ def getProcessedAudio(batch_path,target_sr):
     audio_array = np.asarray(batch_data,dtype="object")
     return audio_array
 
+def padding_output(pre_processed_data,max_length):
+    standardized_data = []
+    if (max_length % 2) != 0:
+        max_length = max_length + 1
+    for arr in pre_processed_data:
+        if arr.shape[0] < max_length:
+            # Pad with zeros to match max_length
+            padded_arr = np.pad(arr, [(0, max_length - arr.shape[0]), (0, 0)], mode='constant')
+            print(padded_arr)
+        else:
+            # Truncate to max_length
+            padded_arr = arr[:max_length, :]
+            print(padded_arr)
+        standardized_data.append(padded_arr)
+
+    for val in standardized_data:
+        print(type(val), val.shape)
+        print(val)
+    return standardized_data
+
 def audio_numpy_to_spectogram(audio_data):
     spectogram = librosa.stft( audio_data)
     stft_magnitude, stft_phase = librosa.magphase(spectogram)
