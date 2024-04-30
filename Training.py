@@ -38,8 +38,8 @@ def train(data_path,input_shape):
     print(model.summary())
 
 
-    history =  model.fit(x=x_train_tensor, epochs=100, verbose=0)
-    model.compile(optimizer="adam" ,loss="mean_squared_error")
+    history =  model.fit(x=x_train_tensor,batch_size=64, epochs=100, verbose=2)
+
 
     #model.save("/Users/Kwesi/PycharmProjects/AudioSourceSeparator/train_modelUNO.keras")
     print("Model Trained!")
