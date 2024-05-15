@@ -11,7 +11,7 @@ from tensorflow.keras.layers import Lambda
 '''
 Slightly modified  U-Net Model for Audio Source Extraction
 We utilize causal padding to account for temporal nature of the data
-additionally we use dilated convulation layers to investigate the 
+additionally we use dilated convolution layers to investigate the 
 impact of performance.
 
 TODO:Need to determine suitable size of filters and input size
@@ -23,9 +23,9 @@ def conv_layer(inputs,num_filters):
     :param num_filters:
     :return:
     '''
-    conv1d= tf.keras.layers.Conv1D(num_filters,1, activation='relu', padding='same', dilation_rate=2)(inputs)
+    conv1d= tf.keras.layers.Conv1D(num_filters,1, padding='same')(inputs)
     #print(conv1d.shape)
-    activation = layers.ReLU()(conv1d)
+    activation = layers.ReLU(max_value=100)(conv1d)
     return activation
 
 def adjust_shape_for_concat(decode, skip):
@@ -85,7 +85,7 @@ def build_unet(input_shape):
     #d4 = decoder(d3,e1,1024)
 
 
-    output_layer = tf.keras.layers.Conv1D(1,32,activation='tanh',padding='same')(d3)
+    output_layer = tf.keras.layers.Conv1D(1,1,activation='tanh',padding='same')(d3)
     model = tf.keras.models.Model(inputs,output_layer,name="U-NET")
 
     return model
