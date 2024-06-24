@@ -1,1 +1,2 @@
-testing2testing
+An audio source separator that attempts to isolate vocal sources from an audio file with mixed signals. A Convolutional Neural Network (CNN) is used with an emphasis on a U-Net architecture.
+Tensorflow and Keras was used to create the CNN with the model written in Python.
