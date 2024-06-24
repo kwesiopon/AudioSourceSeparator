@@ -29,7 +29,6 @@ def getBatchFromDataSet(dataset_path,batch_size):
 def getProcessedAudio(batch_path,target_sr):
     '''
     Converts all audio in the batch to numpy array format for analysis by the model
-
     :param batch_path:
     :param target_sr:
     :return:
@@ -72,7 +71,7 @@ def padding_output(pre_processed_data,max_length):
     return standardized_data
 
 def audio_numpy_to_spectogram(audio_data):
-    spectogram = librosa.stft( audio_data)
+    spectogram = librosa.stft(audio_data)
     stft_magnitude, stft_phase = librosa.magphase(spectogram)
 
     magnitude_dB = librosa.amplitude_to_db(stft_magnitude, ref=np.max)

@@ -41,16 +41,16 @@ def adjust_shape_for_concat(decode, skip):
 
 def encoder(inputs,num_filters):
     encode = conv_layer(inputs,num_filters)
-    print("Before Pooling:", encode.shape)
+    #print("Before Pooling:", encode.shape)
     pool_layer = layers.MaxPool1D(pool_size=2,strides=2,padding='same')(encode)
-    print("After Pooling:", pool_layer.shape)
+    #print("After Pooling:", pool_layer.shape)
     return encode,pool_layer
 
 def decoder(inputs,skip,num_filters):
-    print("Before Upsampling:", inputs.shape)
+    #print("Before Upsampling:", inputs.shape)
     decode = layers.UpSampling1D(2)(inputs)
     #decode = layers.Conv1DTranspose(num_filters,1,strides=1,padding='same')(inputs)
-    print("After Upsampling:", decode.shape)
+    #print("After Upsampling:", decode.shape)
 
     # Get shape information for skip and decode tensors
     decode = adjust_shape_for_concat(decode, skip)
@@ -67,22 +67,22 @@ def build_unet(input_shape):
     :param input_shape:
     :return:
     '''
-    inputs = tf.keras.layers.Input(shape=input_shape)
+    inputs = tf.keras.layers.Input(shape=input_shape,batch_size=4)
 
     #Encoder
-    e1, p1 = encoder(inputs,1024)
-    e2, p2 = encoder(p1,1024)
-    e3, p3 = encoder(p2,1024)
-    e4, p4 = encoder(p3, 1024)
+    e1, p1 = encoder(inputs,512)
+    e2, p2 = encoder(p1,512)
+    e3, p3 = encoder(p2,512)
+    e4, p4 = encoder(p3, 512)
 
     #Bridge
-    bridge = conv_layer(p4,1024)
+    bridge = conv_layer(p4,512)
 
     #Decoder
-    d1 = decoder(bridge,e4,1024)
-    d2 = decoder(d1,e3,1024)
-    d3 = decoder(d2, e2,1024)
-    #d4 = decoder(d3,e1,1024)
+    d1 = decoder(bridge,e4,512)
+    d2 = decoder(d1,e3,512)
+    d3 = decoder(d2, e2,512)
+    #d4 = decoder(d3,e1,512)
 
 
     output_layer = tf.keras.layers.Conv1D(1,1,activation='tanh',padding='same')(d3)
