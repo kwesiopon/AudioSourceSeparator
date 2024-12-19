@@ -18,7 +18,6 @@ TODO:Need to determine suitable size of filters and input size
 '''
 def conv_layer(inputs,num_filters):
     '''
-
     :param inputs:
     :param num_filters:
     :return:
@@ -41,23 +40,16 @@ def adjust_shape_for_concat(decode, skip):
 
 def encoder(inputs,num_filters):
     encode = conv_layer(inputs,num_filters)
-    #print("Before Pooling:", encode.shape)
     pool_layer = layers.MaxPool1D(pool_size=2,strides=2,padding='same')(encode)
-    #print("After Pooling:", pool_layer.shape)
     return encode,pool_layer
 
 def decoder(inputs,skip,num_filters):
-    #print("Before Upsampling:", inputs.shape)
     decode = layers.UpSampling1D(2)(inputs)
-    #decode = layers.Conv1DTranspose(num_filters,1,strides=1,padding='same')(inputs)
-    #print("After Upsampling:", decode.shape)
 
     # Get shape information for skip and decode tensors
     decode = adjust_shape_for_concat(decode, skip)
     decode = layers.Concatenate(axis=1)([decode,skip])
     decode = conv_layer(decode,num_filters)
-
-    #decode = layers.Cropping1D(1)(decode)
     return  decode
 
 def build_unet(input_shape):

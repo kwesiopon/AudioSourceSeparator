@@ -20,6 +20,8 @@ def getBatchFromDataSet(dataset_path,batch_size):
     #Shuffle the audio files for randomness
     np.random.shuffle(audio_files)
 
+    batch_paths = []
+
     #Yield batches of audio data
     for i in range(0,len(audio_files),batch_size):
         batch_paths = audio_files[i:i + batch_size]
